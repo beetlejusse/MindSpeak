@@ -1,19 +1,17 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { useDebounceCallback } from "usehooks-ts";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { signUpSchema } from "@/schemas/signUpSchema";
 import axios, { AxiosError } from "axios";
 import { ApiResponse } from "@/types/ApiResponse";
-import { ReloadIcon } from "@radix-ui/react-icons";
-import { Boxes } from "@/components/ui/background-boxes";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Form,
@@ -25,20 +23,18 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { BackgroundBeams } from "@/components/ui/background-beams";
 
 export default function SignupPage() {
-  const [userName, setuserName] = useState("");
-  const [nameMessage, setnameMessage] = useState("");
-  const [isCheckingUserName, setisCheckingUserName] = useState(false);
-  const [isSubmitted, setisSubmitted] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [nameMessage, setNameMessage] = useState("");
+  const [isCheckingUserName, setIsCheckingUserName] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
 
-  //debouncing
-  const debouncedUserName = useDebounceCallback(setuserName, 300);
+  const debouncedUserName = useDebounceCallback(setUserName, 300);
 
-  //zod
   const form = useForm<z.infer<typeof signUpSchema>>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -48,26 +44,24 @@ export default function SignupPage() {
     },
   });
 
-  //debouncing ke baad ek request jayegi jo check karegi username
   useEffect(() => {
     const checkUniqueName = async () => {
       if (userName) {
-        setisCheckingUserName(true);
-        setnameMessage("");
+        setIsCheckingUserName(true);
+        setNameMessage("");
 
         try {
           const response = await axios.get<ApiResponse>(
             `/api/check-unique-username?userName=${userName}`
           );
-          setnameMessage(response.data.message);
-          console.log(response.data.message);
+          setNameMessage(response.data.message);
         } catch (error) {
-          const axioserror = error as AxiosError<ApiResponse>;
-          setnameMessage(
-            axioserror.response?.data.message ?? "Error finding username"
+          const axiosError = error as AxiosError<ApiResponse>;
+          setNameMessage(
+            axiosError.response?.data.message ?? "Error finding username"
           );
         } finally {
-          setisCheckingUserName(false);
+          setIsCheckingUserName(false);
         }
       }
     };
@@ -75,7 +69,7 @@ export default function SignupPage() {
   }, [userName]);
 
   const onSubmit = async (data: z.infer<typeof signUpSchema>) => {
-    setisSubmitted(true);
+    setIsSubmitted(true);
     try {
       const response = await axios.post<ApiResponse>("/api/sign-up", data);
       toast({
@@ -83,135 +77,105 @@ export default function SignupPage() {
         description: response.data.message,
         variant: "default",
       });
-      // router.replace(`/verify/${userName}`);
       router.replace(`/sign-in`);
-      setisSubmitted(false)
     } catch (error) {
-      console.error("Error in signup of user", error);
-      const axioserror = error as AxiosError<ApiResponse>;
-      let errorMsg = axioserror.response?.data.message;
+      const axiosError = error as AxiosError<ApiResponse>;
       toast({
         title: "Signup Failed",
-        description: errorMsg,
+        description: axiosError.response?.data.message,
         variant: "destructive",
       });
     } finally {
-      setisSubmitted(false);
+      setIsSubmitted(false);
     }
-    // console.log(data);
   };
 
   return (
-    <>
-      <div className="flex justify-center items-center bg-slate-900 h-screen w-screen absolute overflow-hidden ">
-        <div className="w-full max-w-md p-8 space-y-8 bg-[#e7d9b2] rounded-lg shadow-lg z-10">
-          <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-4">
-              Welcome to MindSpeak
-            </h1>
-          </div>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                name="userName"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input
-                        className="border-black placeholder:text-black placeholder:font-medium"
-                        placeholder="Enter Here"
-                        {...field}
-                        onChange={(e) => {
-                          field.onChange(e);
-                          debouncedUserName(e.target.value);
-                        }}
-                      />
-                    </FormControl>
-                    {isCheckingUserName && <Loader2 className="animate-spin" />}
-                    <p
-                      className={`text-sm font-semibold ${
-                        nameMessage === "Username's Unique"
-                          ? "text-indigo-800"
-                          : "text-red-500"
-                      }`}
-                    >
-                      {nameMessage}
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+    <div className="relative flex justify-center items-center min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white p-6 overflow-hidden">
+      <div className="absolute inset-0 w-full h-full opacity-30 animate-pulse" />
+      <div className="absolute top-0 left-0 w-full h-full bg-gradient-radial from-transparent to-gray-900 opacity-50 animate-spin-slow" />
+      <div className="relative w-full max-w-md bg-gray-900 shadow-lg rounded-xl p-8 space-y-6 z-10">
+        <h1 className="text-3xl font-bold text-center">Join MindSpeak</h1>
+        <p className="text-gray-400 text-center">Create an account to get started</p>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              name="userName"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter your username"
+                      className="bg-gray-800 border-gray-700 text-white"
+                      {...field}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        debouncedUserName(e.target.value);
+                      }}
+                    />
+                  </FormControl>
+                  {isCheckingUserName && <Loader2 className="animate-spin h-5 w-5 mt-1" />}
+                  <p className={`text-sm ${nameMessage.includes("Unique") ? "text-green-500" : "text-red-500"}`}>{nameMessage}</p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                name="email"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="name@domain.com"
-                        className="border-black placeholder:text-black placeholder:font-medium"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <FormField
+              name="email"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="email"
+                      placeholder="you@example.com"
+                      className="bg-gray-800 border-gray-700 text-white"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                name="password"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="Enter Here"
-                        className="border-black placeholder:text-black placeholder:font-medium"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button
-                type="submit"
-                className="w-full text-center "
-                disabled={isSubmitted}
-              >
-                {isSubmitted ? (
-                  <>
-                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
-                    Please wait
-                  </>
-                ) : (
-                  "SignUp"
-                )}
-              </Button>
-              <div className="text-center">
-                <h3>
-                  Already a member?{" "}
-                  <Link
-                    href="/sign-in"
-                    className="text-blue-600 hover:text-blue-800 font-semibold"
-                  >
-                    Sign in Now
-                  </Link>
-                </h3>
-              </div>
-            </form>
-          </Form>
-        </div>
-        <div className="absolute inset-0 w-full bg-slate-900 [mask-image:radial-gradient(transparent,white)] pointer-events-none" />
-        <Boxes />
+            <FormField
+              name="password"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="password"
+                      placeholder="Enter a strong password"
+                      className="bg-gray-800 border-gray-700 text-white"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500" disabled={isSubmitted}>
+              {isSubmitted ? <Loader2 className="animate-spin h-5 w-5" /> : "Sign Up"}
+            </Button>
+          </form>
+        </Form>
+
+        <p className="text-center text-gray-400 text-sm">
+          Already have an account?{' '}
+          <Link href="/sign-in" className="text-indigo-400 hover:underline">
+            Sign in here
+          </Link>
+        </p>
       </div>
-    </>
+      <BackgroundBeams />
+
+    </div>
   );
 }
