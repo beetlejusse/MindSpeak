@@ -1,80 +1,82 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
-import { Mail } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
+import { Mail, Users, Shield, Quote, MessageCircleCode } from "lucide-react";
 import React from "react";
 import messages from "@/messages.json";
 import Autoplay from "embla-carousel-autoplay";
-import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
-import { TypewriterEffect } from "@/components/ui/typewriter-effect";
+import { motion } from "framer-motion";
 import Navbar from "@/components/custom-ui/navbar";
+import Link from "next/link";
 
 const HomePage = () => {
-  const words2 = [
-    { text: "MindSpeak", className: "bg-clip-text bg-gradient-to-r text-purple-400" },
-    { text: "-", className: "bg-clip-text bg-gradient-to-r text-purple-400" },
-    { text: "Say", className: "bg-clip-text bg-gradient-to-r text-purple-400" },
-    { text: "anything", className: "bg-clip-text bg-gradient-to-r text-purple-500" },
-    { text: "you", className: "bg-clip-text bg-gradient-to-r text-violet-500" },
-    { text: "want, ", className: "bg-clip-text bg-gradient-to-r text-violet-500" },
-    { text: "without", className: "bg-clip-text bg-gradient-to-r text-violet-500" },
-    { text: "revealing", className: "bg-clip-text bg-gradient-to-r text-pink-500" },
-    { text: "your", className: "bg-clip-text bg-gradient-to-r text-pink-500" },
-    { text: "true", className: "bg-clip-text bg-gradient-to-r text-pink-700" },
-    { text: "Identity.", className: "bg-clip-text bg-gradient-to-r text-pink-700" },
-  ];
-
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-900 to-black text-white">
       <Navbar />
-      <BackgroundBeamsWithCollision className="flex-grow">
-        <div className="flex-grow flex flex-col items-center justify-center px-4 h-full sm:px-6 md:px-8 lg:px-12 xl:px-24 bg-[#242424] text-slate-500">
-          <section className="text-center mb-6 sm:mb-8 md:mb-10 lg:mb-12">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 md:mb-8">
-              Dive into the World of Anonymous FeedBack...
-            </h1>
-            <div className="bg-clip-text bg-no-repeat text-transparent bg-gradient-to-r py-2 sm:py-3 md:py-4">
-              <p className="tracking-tight font-semibold text-xs sm:text-sm md:text-base lg:text-lg">
-                <TypewriterEffect words={words2} />
-              </p>
-            </div>
-          </section>
-          {/* Carousel for Messages */}
-          <Carousel
-            plugins={[Autoplay({ delay: 2000 })]}
-            className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl"
-          >
-            <CarouselContent>
-              {messages.map((message, index) => (
-                <CarouselItem key={index} className="p-2 sm:p-3 md:p-4">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-sm sm:text-base md:text-lg lg:text-xl">{message.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex flex-col sm:flex-row items-start space-y-2 sm:space-y-0 sm:space-x-2 md:space-x-4">
-                      <Mail className="flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-                      <div>
-                        <p className="text-xs sm:text-sm md:text-base">{message.content}</p>
-                        <p className="text-xxs sm:text-xs text-muted-foreground mt-1">
-                          {message.received}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
+      <main className="flex-grow flex flex-col items-center justify-center text-center px-6 sm:px-12">
+        {/* Hero Section */}
+        <motion.section
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          className="max-w-3xl mt-12 sm:mt-20"
+        >
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-400">
+            Share Your Thoughts, Stay Anonymous
+          </h1>
+          <p className="mt-4 text-lg text-gray-300">
+            Speak freely without revealing your identity. Connect with honesty and transparency.
+          </p>
+          <Button className="mt-6 px-6 py-3 text-lg font-semibold bg-purple-500 hover:bg-purple-600 rounded-lg shadow-lg transition-transform hover:scale-105">
+            <Link href="/sign-up">Get Started</Link>
+          </Button>
+        </motion.section>
+        <section className="mt-16 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl">
+          {[{ icon: Users, title: "Community", desc: "Engage with an open and supportive community.", color: "text-purple-400" },
+            { icon: Shield, title: "Privacy", desc: "Your identity remains anonymous and secure.", color: "text-green-400" },
+            { icon: Mail, title: "Messaging", desc: "Express your thoughts freely with like-minded people.", color: "text-blue-400" }
+          ].map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.2 }}
+            >
+              <Card className="p-6 bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transform hover:scale-105 transition-transform border border-gray-700">
+                <CardHeader className="flex flex-col items-center">
+                  <feature.icon size={40} className={`${feature.color}`} />
+                  <CardTitle className="mt-4 text-xl font-semibold text-white">{feature.title}</CardTitle>
+                </CardHeader>
+                <CardContent className="text-gray-400 text-sm text-center">
+                  {feature.desc}
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </section>
+        <motion.section 
+          initial={{ opacity: 0, x: -20 }} 
+          animate={{ opacity: 1, x: 0 }} 
+          transition={{ duration: 0.8 }}
+          className="mt-16 w-full max-w-3xl"
+        >
+          <Carousel plugins={[Autoplay({ delay: 3000 })]}>
+            <CarouselContent className="flex justify-center gap-10">
+              {messages.map((msg, index) => (
+                <CarouselItem key={index} className="p-6 bg-gray-900 shadow-lg flex flex-col items-center text-center w-full">
+                  <MessageCircleCode size={32} className="text-purple-400 mb-4" />
+                  <p className="text-gray-300 italic text-lg text-center w-4/5">"{msg.content}"</p>
+                  <p className="mt-4 text-sm text-gray-500 font-medium">- {msg.author}</p>
                 </CarouselItem>
               ))}
             </CarouselContent>
           </Carousel>
-        </div>
-      </BackgroundBeamsWithCollision>
+        </motion.section>
+      </main>
     </div>
   );
 };
 
 export default HomePage;
-
