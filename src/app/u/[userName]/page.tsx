@@ -24,6 +24,8 @@ import { ApiResponse } from "@/types/ApiResponse";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { messageSchema } from "@/schemas/messageSchema";
+import { ShootingStars } from "@/components/ui/shooting-stars";
+import { StarsBackground } from "@/components/ui/stars-background";
 
 // Separator used for splitting the AI response
 const specialChar = "||";
@@ -109,27 +111,27 @@ export default function SendMessage() {
   };
 
   return (
-    <div className="container min-h-screen p-12 bg-gradient-to-r from-gray-100 to-gray-300 rounded-lg shadow-lg min-w-full">
-      <h1 className="text-3xl lg:text-5xl font-extrabold mb-8 text-center text-gray-800">
+    <div className="container min-h-screen bg-gradient-to-b from-neutral-900 to-neutral-800 p-12 shadow-lg min-w-full">
+      <h1 className="text-3xl lg:text-5xl font-extrabold mb-8 placeholder:text-gray-300 text-center text-gray-300 z-20">
         Share Your Thoughts Anonymously
       </h1>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-6 bg-white p-6 rounded-md shadow-md"
+          className="space-y-6 bg-transparent p-6 rounded-md shadow-md z-20"
         >
           <FormField
             control={form.control}
             name="content"
             render={({ field }) => (
               <FormItem>
-                <FormLabel className="text-lg font-medium">
+                <FormLabel className="text-lg font-medium text-gray-300 z-30">
                   Message to @{userName}
                 </FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Type your anonymous message here..."
-                    className="resize-none border rounded-md focus:border-gray-500 focus:ring-gray-500"
+                    className="resize-none  rounded-md text-gray-300 "
                     {...field}
                   />
                 </FormControl>
@@ -159,7 +161,7 @@ export default function SendMessage() {
         </form>
       </Form>
 
-      <div className="space-y-4 my-8">
+      <div className="space-y-4 my-8 z-20">
         <div className="text-center">
           <Button
             onClick={fetchSuggestedMessages}
@@ -168,13 +170,13 @@ export default function SendMessage() {
           >
             {isSuggestLoading ? "Loading..." : "Suggest Messages from AI"}
           </Button>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-400 mt-2">
             Select a suggested message below to quickly add it!
           </p>
         </div>
-        <Card className="p-4 bg-white rounded-md shadow-md">
+        <Card className="p-4 bg-transparent rounded-md shadow-md">
           <CardHeader>
-            <h3 className="text-xl font-semibold text-gray-800">
+            <h3 className="text-xl font-semibold text-gray-200">
               Suggested Messages
             </h3>
           </CardHeader>
@@ -196,15 +198,16 @@ export default function SendMessage() {
           </CardContent>
         </Card>
       </div>
-      <Separator className="my-6" />
-      <div className="text-center">
-        <p className="mb-4 text-gray-600">Join us to enhance your experience!</p>
+      <Separator className="my-6 inset-0 z-20" />
+      <div className="text-center z-20">
+        <p className="mb-4 text-gray-400">Join us to enhance your experience!</p>
         <Link href={"/sign-up"}>
           <Button className="bg-gray-700 text-white py-2 px-6 rounded-md shadow-lg hover:scale-105 transition-transform duration-300">
             Create Account
           </Button>
         </Link>
       </div>
+      {/* <StarsBackground className="absolute inset-0 z-0" /> */}
     </div>
   );
 }
