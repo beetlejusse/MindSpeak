@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import AuthProvider from "@/context/AuthProvider";
 import { Toaster } from "@/components/ui/toaster"
 import Navbar from "@/components/custom-ui/navbar";
+import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,6 +33,7 @@ export default function RootLayout({
           className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
           {children}
+          <Analytics />
           <Toaster />
         </body>
       </AuthProvider>
